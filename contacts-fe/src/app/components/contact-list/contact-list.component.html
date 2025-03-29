@@ -1,0 +1,48 @@
+<!-- <div class="form-floating">
+  <input type="name" class="form-control" id="floatingInput" placeholder="name@example.com">
+  <label for="floatingInput">Email address</label>
+</div>
+<div class="form-floating">
+  <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+  <label for="floatingPassword">Password</label>
+</div> -->
+
+
+<div class="container">
+  <form class="d-flex my-3">
+    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" (input)="search($event)"
+      [(ngModel)]="searchText" name="search">
+    <!-- <button class="btn btn-outline-success" type="submit">Search</button> -->
+  </form>
+  @if(contacts.length > 0){
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        @for(itemsHeder of contactListHeader; track itemsHeder){
+        <th>{{itemsHeder}}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @if(tempContacts.length>0){
+      @for (data of tempContacts; track data._id) {
+      <tr>
+        @for (key of contactListHeader; track key) {
+        <td>{{ data[key] }}</td>
+        }
+      </tr>
+      }
+      }
+      @else {
+      <tr>
+        <td [attr.colspan]="contactListHeader.length" class="text-center"> No Search Records Found</td>
+      </tr>
+      }
+    </tbody>
+
+  </table>
+  }
+  @else {
+  <div>No Records Available</div>
+  }
+</div>

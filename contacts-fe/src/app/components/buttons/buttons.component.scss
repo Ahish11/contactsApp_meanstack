@@ -1,0 +1,36 @@
+// .btn {
+//   color: white;
+//   background-color: #0D3133;
+// }
+.btn {
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  &.default {
+    background-color: #e0e0e0;
+    color: #000;
+  }
+
+  &.primary {
+    background-color: #0D3133;
+    color: white;
+  }
+
+  &.secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  &.success {
+    background-color: #28a745;
+    color: white;
+  }
+
+  &.danger {
+    background-color: #dc3545;
+    color: white;
+  }
+}
