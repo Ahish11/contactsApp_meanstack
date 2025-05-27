@@ -1,1 +1,26 @@
-<p>datatable works!</p>
+<form class="d-flex my-3">
+  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" (input)="search($event)">
+  <!-- <button class="btn btn-outline-success" type="submit">Search</button> -->
+</form>
+
+
+<table class="table">
+  <thead>
+    <tr>
+      @for(headeritem of headerData; track headerData){
+      <th>{{headeritem}}</th>
+      }
+    </tr>
+  </thead>
+  <tbody class="table-group-divider">
+
+    @for(rowItems of rowdata; track rowItems['_id']){
+    <tr>
+      @for(headeritem of headerData; track headeritem){
+      <td>{{rowItems[headeritem]}}</td>
+      }
+    </tr>
+    }
+
+  </tbody>
+</table>

@@ -35,7 +35,7 @@ const {
 const validateToken = require("../middleware/validateTokenHandler");
 
 //should be at top
-router.use(validateToken); //validate private routes
+// router.use(validateToken); //validate private routes
 //Get request
 router.route("/").get(getContacts).post(createContact); //!if same route
 router.route("/:id").get(getContact);

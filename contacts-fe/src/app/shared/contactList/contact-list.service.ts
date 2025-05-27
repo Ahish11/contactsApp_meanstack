@@ -21,7 +21,7 @@ export class ContactListService {
   getContactList(): Observable<Contact[]> {
     return this.http
       .get<Contact[]>(`${this.apiURL}/contacts`)
-      .pipe(catchError(this.handleError<Contact[]>('getContactList', [])));
+      // .pipe(catchError(this.handleError<Contact[]>('getContactList', [])));
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

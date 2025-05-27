@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DatatableComponent } from './datatable.component';
+import { LoaderUiComponent } from './loader-ui.component';
 
-describe('DatatableComponent', () => {
-  let component: DatatableComponent;
-  let fixture: ComponentFixture<DatatableComponent>;
+describe('LoaderUiComponent', () => {
+  let component: LoaderUiComponent;
+  let fixture: ComponentFixture<LoaderUiComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DatatableComponent]
+      imports: [LoaderUiComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DatatableComponent);
+    fixture = TestBed.createComponent(LoaderUiComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

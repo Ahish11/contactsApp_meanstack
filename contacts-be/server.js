@@ -10,7 +10,14 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // 1st api ❤
-app.use(cors()); // Enable CORS for all routes
+// app.use(cors()); // Enable CORS for all routes
+app.use(
+  cors({
+    origin: "http://localhost:4200", // or "*" to allow all during development
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 //!app.use - isMiddleware and adding rotes config
 app.use(express.json()); //to pass (body) client to server
 app.use("/api/contacts", require("./routes/contact.Routes"));

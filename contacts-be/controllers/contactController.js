@@ -10,8 +10,8 @@ const Contact = require("../models/contactModel");
 //@ http://localhost:5001/api/contacts
 //@ get
 const getContacts = asyncHandler(async (request, response) => {
-  // const contact = await Contact.find();//
-  const contact = await Contact.find({ user_id: request.user.id }); //get loggedIn contact
+  const contact = await Contact.find(); // all contacts
+  // const contact = await Contact.find({ user_id: request.user.id }); //get loggedIn contact
   console.log(contact, "contact Collection");
   response.status(200).json(contact);
 });
