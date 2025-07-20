@@ -53,9 +53,13 @@ export class ContactListComponent {
         next: (contacts) => {
           this.contacts = contacts;
           this.tempContacts = contacts;
-          this.contactListHeader = Object.keys(
-            this.contacts[0]
-          ) as (keyof Contact)[];
+          if (this.contacts.length > 0) {
+            this.contactListHeader = Object.keys(
+              this.contacts[0]
+            ) as (keyof Contact)[];
+          } else {
+            this.contactListHeader = []; // or set some default headers if needed
+          }
 
           console.log(this.contacts);
           console.log(this.contactListHeader, 'contactListHeader');
@@ -86,5 +90,16 @@ export class ContactListComponent {
         String(value).toLowerCase().includes(searchVal)
       );
     });
+  }
+
+
+  onEdit(item: any) {
+    console.log('Edit item:', item);
+    // Implement edit logic
+  }
+
+  onDelete(item: any) {
+    console.log('Delete item:', item);
+    // Implement delete logic
   }
 }

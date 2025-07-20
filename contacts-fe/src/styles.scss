@@ -1,249 +1,362 @@
-/* You can add global styles to this file, and also import other style files */
-
-/* Importing Bootstrap SCSS file. */
-@import 'bootstrap/scss/bootstrap';
-
-// .form-floating .form-control {
-//   padding: 9px 10px !important;
-
+// .btn-save {
+//   @extend .btn;
+//   @extend .btn-outline;
+//   @extend .btn-outline-primary;
+//   @extend .btn-active-primary;
+//   @extend .bg-secondary-200;
 // }
 
-// .form-floating {
-//   height: 34px !important;
+// .page-heading {
+//   @extend .text-dark;
+//   @extend .fw-bold;
+//   @extend .fs-3;
+//   @extend .text-header;
+//   @extend .mb-0;
+// }
+// .container-fluid {
+//   @extend .p-2;
+// }
+// .form-row {
+//   @extend .row;
+//   @extend .mt-4;
+// }
+// .btn-icon {
+//   @extend .fs-4;
+// }
+// .modal-header {
+//   @extend .bg-primary;
+//   @extend .p-4;
+// }
+// .modal-title {
+//   @extend .text-white;
+// }
+// .modal-body {
+//   @extend .px-5;
+//   @extend .py-2;
+// }
+// .menu-icon {
+//   @extend .fs-3;
+//   @extend .text-primary;
+//   // &::before,
+//   // [class^="bi-"]::before,
+//   // [class*=" bi-"]::before {
+//   //   font-weight: 600 !important;
+//   // }
+// }
+// .table {
+//   @extend.table;
+//   @extend.rounded;
+//   @extend.table-row-bordered;
+//   @extend.border;
+//   @extend.gy-2;
+//   @extend.gs-2;
+//   @extend.table-striped;
+//   @extend.w-100;
 // }
 
+// .text-overflow {
+//   @extend .text-nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
 
+// .btn-auth-outline {
+//   border-color: #0d3133 !important;
+//   background-color: #e4e9e7 !important;
+//   color: #0d3133 !important;
+//   i {
+//     color: #0d3133 !important;
+//   }
+// }
 
-//
-// General form controls (plus a few specific high-level interventions)
-//
-
-.form-control {
-  display: block;
-  width: 100%;
-  padding: $input-padding-y $input-padding-x;
-  font-family: $input-font-family;
-  @include font-size($input-font-size);
-  font-weight: $input-font-weight;
-  line-height: $input-line-height;
-  color: $input-color;
-  appearance: none; // Fix appearance for date inputs in Safari
-  background-color: $input-bg;
-  background-clip: padding-box;
-  border: $input-border-width solid $input-border-color;
-
-  // Note: This has no effect on <select>s in some browsers, due to the limited stylability of `<select>`s in CSS.
-  @include border-radius($input-border-radius, 0);
-
-  @include box-shadow($input-box-shadow);
-  @include transition($input-transition);
-
-  &[type="file"] {
-    overflow: hidden; // prevent pseudo element button overlap
-
-    &:not(:disabled):not([readonly]) {
-      cursor: pointer;
-    }
-  }
-
-  // Customize the `:focus` state to imitate native WebKit styles.
-  &:focus {
-    color: $input-focus-color;
-    background-color: $input-focus-bg;
-    border-color: $input-focus-border-color;
-    box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px;
-    outline: 0;
-
-    @if $enable-shadows {
-      @include box-shadow($input-box-shadow, $input-focus-box-shadow);
-    }
-
-    @else {
-      // Avoid using mixin so we can pass custom focus shadow properly
-      box-shadow: $input-focus-box-shadow;
-    }
-  }
-
-  &::-webkit-date-and-time-value {
-    // On Android Chrome, form-control's "width: 100%" makes the input width too small
-    // Tested under Android 11 / Chrome 89, Android 12 / Chrome 100, Android 13 / Chrome 109
-    //
-    // On iOS Safari, form-control's "appearance: none" + "width: 100%" makes the input width too small
-    // Tested under iOS 16.2 / Safari 16.2
-    min-width: 85px; // Seems to be a good minimum safe width
-
-    // Add some height to date inputs on iOS
-    // https://github.com/twbs/bootstrap/issues/23307
-    // TODO: we can remove this workaround once https://bugs.webkit.org/show_bug.cgi?id=198959 is resolved
-    // Multiply line-height by 1em if it has no unit
-    height: if(unit($input-line-height)=="", $input-line-height * 1em, $input-line-height);
-
-    // Android Chrome type="date" is taller than the other inputs
-    // because of "margin: 1px 24px 1px 4px" inside the shadow DOM
-    // Tested under Android 11 / Chrome 89, Android 12 / Chrome 100, Android 13 / Chrome 109
-    margin: 0;
-  }
-
-  // Prevent excessive date input height in Webkit
-  // https://github.com/twbs/bootstrap/issues/34433
-  &::-webkit-datetime-edit {
-    display: block;
-    padding: 0;
-  }
-
-  // Placeholder
-  &::placeholder {
-    color: $input-placeholder-color;
-    // Override Firefox's unusual default opacity; see https://github.com/twbs/bootstrap/pull/11526.
-    opacity: 1;
-  }
-
-  // Disabled inputs
-  //
-  // HTML5 says that controls under a fieldset > legend:first-child won't be
-  // disabled if the fieldset is disabled. Due to implementation difficulty, we
-  // don't honor that edge case; we style them as disabled anyway.
-  &:disabled {
-    color: $input-disabled-color;
-    background-color: $input-disabled-bg;
-    border-color: $input-disabled-border-color;
-    // iOS fix for unreadable disabled content; see https://github.com/twbs/bootstrap/issues/11655.
-    opacity: 1;
-  }
-
-  // File input buttons theming
-  &::file-selector-button {
-    padding: $input-padding-y $input-padding-x;
-    margin: (-$input-padding-y) (-$input-padding-x);
-    margin-inline-end: $input-padding-x;
-    color: $form-file-button-color;
-    @include gradient-bg($form-file-button-bg);
-    pointer-events: none;
-    border-color: inherit;
-    border-style: solid;
-    border-width: 0;
-    border-inline-end-width: $input-border-width;
-    border-radius: 0; // stylelint-disable-line property-disallowed-list
-    @include transition($btn-transition);
-  }
-
-  &:hover:not(:disabled):not([readonly])::file-selector-button {
-    background-color: $form-file-button-hover-bg;
+body {
+  background-color: #f6f6f5 !important;
+}
+//!used only common class
+//col-gap classes
+@for $i from 1 through 20 {
+  .col-gap-#{$i} {
+    column-gap: #{$i * 2}px;
   }
 }
-
-//ng-select view
-.ng-select {
-  border: $input-border-width solid $input-border-color !important;
+//row-gap classes
+@for $i from 1 through 20 {
+  .row-gap-#{$i} {
+    row-gap: #{$i * 2}px;
+  }
+}
+//font size f-9
+@for $i from 1 through 50 {
+  .f-#{$i} {
+    font-size: #{$i * 1}px;
+  }
+}
+// !Common btns
+.btn-ash {
+  border: 1px solid var(--ab-primary) !important;
+}
+.btn-disable {
+  background-color: #e2e0dc;
+  color: #888684;
+}
+.btn-disable:hover {
+  background-color: #e2e0dc !important;
+  color: #888684 !important;
+}
+.backBtn-edit {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #c7ceca;
+}
+// !Common table style
+.table-th-green > thead > tr > th {
+  background-color: var(--ab-secondary-default);
+  background-color: #789187;
+  color: var(--ab-white) !important;
+  padding: 12px 7px;
+  white-space: nowrap;
+  font-weight: 600 !important;
+}
+.table-th-green tr th:first-child {
+  border-top-left-radius: 6px;
+}
+.table-th-green tr th:last-child {
+  border-top-right-radius: 6px;
+}
+.table-th-green > tbody > tr > td {
+  padding: 15px 9px;
+  border-bottom: 1px solid #a5a5a5;
+}
+// !Success popup style
+.circle-icon {
+  font-size: 84px !important;
+  color: #fb9c2e;
+}
+.txt-dashBoard {
+  color: #fb9c2e;
+}
+.modal-Manual-wrapper,
+.viewWrapper {
+  // background-color: #00313399;
+  background-color: #00000086;
+}
+.view_area {
+  .bi-x-lg::before {
+    content: "\f659";
+    font-weight: 700 !important;
+  }
+}
+.bg-modal-blur {
+  background-color: #00000086;
+  // backdrop-filter: blur(1px);
+}
+.border-1 {
+  border-bottom: 1px solid #878787;
 }
 
-.ng-select-noborder {
-  border: none !important;
+// !For Masters only:start
+.lable-txt-colour {
+  color: var(--ab-ash-270);
+}
+.Master_h {
+  font-size: 18px !important;
+}
+.chk-box {
+  border: 1px solid var(--ab-ash-240) !important;
+}
+.txt-client {
+  color: #171616;
+  margin-bottom: 0 !important;
+}
+// !For Masters only:end
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
+// !autofill remover
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--ab-white) inset !important;
+}
+.dropdown-list {
+  overflow: hidden !important;
+}
+//Common Badges
+.commonBadge {
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+.status-ash {
+  @extend .commonBadge;
+  color: #3a423e;
+  background-color: #e3e6e5;
+}
+.status-blue {
+  @extend .commonBadge;
+  color: #0466c8;
+  background-color: #e6f0fa;
+}
+.status-orange {
+  @extend .commonBadge;
+  color: #ff6d00;
+  background-color: #fff0e6;
+}
+.status-green {
+  @extend .commonBadge;
+  color: #00ab55;
+  background-color: #e6f7ee;
+}
+.status-red {
+  @extend .commonBadge;
+  color: #8c0000;
+  background-color: #fae7e7;
+}
+.status-purple {
+  @extend .commonBadge;
+  color: #6700ef;
+  background-color: #6e00ff40;
+}
+.status-yellow {
+  @extend .commonBadge;
+  color: #c9b000;
+  background-color: rgb(255 236 99 / 46%);
+}
+.status-lightBlue {
+  @extend .commonBadge;
+  color: #009fbd;
+  background-color: #b9f4ff70;
+}
+.status-voilet {
+  @extend .commonBadge;
+  color: #e400ff;
+  background-color: #ffd2ff;
+}
+.status-lightblack {
+  @extend .commonBadge;
+  color: #000000;
+  background-color: #e7e7e7;
+}
+.invoiceDisableBtn {
+  border: 1px solid var(--ab-primary) !important;
+  opacity: 0.4;
+  pointer-events: none !important;
+  background-color: var(--ab-white);
+  color: var(--ab-primary);
+}
+.invoiceEnableBtn {
+  background-color: var(--ab-primary);
+  color: var(--ab-white);
+}
+.invoiceEnableBtn:hover {
+  background-color: var(--ab-primary);
+  color: var(--ab-white);
+}
+.shadowBg {
+  box-shadow: 0px 0px 8px 0px rgba(0, 27, 51, 0.1490196078);
+  border-radius: 5px;
+}
+.form-check-input {
+  border: 1px solid var(--ab-ash-240);
+  color: #1e1e1e;
+  cursor: pointer;
+}
+.radioTxt {
+  color: #1e1e1e;
+  font-size: 14px;
+}
+.border_top {
+  border-bottom: 1px solid #e0e0e0;
+}
+//checkbox changes
+::ng-deep #head {
+  border: 1px solid #a5a5a5 !important;
+}
+//for total color
+.bg_blue {
+  background-color: #e7ebeb;
+  border: 1px solid var(--ab-ash-210);
+}
+.componentWhiteBg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: white;
+}
+.wordbreak {
+  word-break: break-word;
+}
+.outerChooseFile {
+  border: 1px solid #a5a5a5;
+  height: 37px;
+  background-color: var(--ab-white) !important;
+}
+.imaglabel {
+  font-size: 11px !important;
+  top: -9px !important;
+  left: 18px !important;
+  font-weight: 400 !important;
+  z-index: 1;
+  color: rgba(var(--ab-body-color-rgb), 0.65);
+}
+.singleDatePickerLable {
+  top: -16px !important;
+  background-color: var(--ab-white) !important;
+  z-index: 20 !important;
+  font-size: 11px !important;
+  color: rgba(7, 20, 55, 0.65);
 }
 
-// Readonly controls as plain text
-//
-// Apply class to a readonly input to make it appear like regular plain
-// text (without any border, background color, focus indicator)
-
-.form-control-plaintext {
-  display: block;
-  width: 100%;
-  padding: $input-padding-y 0;
-  margin-bottom: 0; // match inputs if this class comes on inputs with default margins
-  line-height: $input-line-height;
-  color: $input-plaintext-color;
+// dollar input
+.bi-currency-dollar::before {
+  content: "\f636";
+  font-weight: 700 !important;
+}
+.boderInputappend {
+  border: 1px solid #a5a5a5;
+  border-radius: unset;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+.input-group-text {
+  border: unset !important;
+}
+.dollarSymbol {
+  height: 36px;
+  display: flex;
+  padding-left: 8px;
+  align-items: center;
+  font-size: 17px;
   background-color: transparent;
-  border: solid transparent;
-  border-width: $input-border-width 0;
-
-  &:focus {
-    outline: 0;
-  }
-
-  &.form-control-sm,
-  &.form-control-lg {
-    padding-right: 0;
-    padding-left: 0;
-  }
+  color: #444342;
 }
-
-// Form control sizing
-//
-// Build on `.form-control` with modifier classes to decrease or increase the
-// height and font-size of form controls.
-//
-// Repeated in `_input_group.scss` to avoid Sass extend issues.
-
-.form-control-sm {
-  min-height: $input-height-sm;
-  padding: $input-padding-y-sm $input-padding-x-sm;
-  @include font-size($input-font-size-sm);
-  @include border-radius($input-border-radius-sm);
-
-  &::file-selector-button {
-    padding: $input-padding-y-sm $input-padding-x-sm;
-    margin: (-$input-padding-y-sm) (-$input-padding-x-sm);
-    margin-inline-end: $input-padding-x-sm;
-  }
+.boderForSymbol {
+  height: 38px;
+  border: 1px solid #a5a5a5 !important;
 }
-
-.form-control-lg {
-  min-height: $input-height-lg;
-  padding: $input-padding-y-lg $input-padding-x-lg;
-  @include font-size($input-font-size-lg);
-  @include border-radius($input-border-radius-lg);
-
-  &::file-selector-button {
-    padding: $input-padding-y-lg $input-padding-x-lg;
-    margin: (-$input-padding-y-lg) (-$input-padding-x-lg);
-    margin-inline-end: $input-padding-x-lg;
-  }
+.focusTop {
+  top: -18px !important;
+  background-color: var(--ab-white) !important;
+  font-size: 11px !important;
+  z-index: 30 !important;
 }
-
-// Make sure textareas don't shrink too much when resized
-// https://github.com/twbs/bootstrap/pull/29124
-// stylelint-disable selector-no-qualifying-type
-textarea {
-  &.form-control {
-    min-height: $input-height;
-  }
-
-  &.form-control-sm {
-    min-height: $input-height-sm;
-  }
-
-  &.form-control-lg {
-    min-height: $input-height-lg;
-  }
+//img upload
+.file-div {
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 11px;
 }
-
-// stylelint-enable selector-no-qualifying-type
-
-.form-control-color {
-  width: $form-color-width;
-  height: $input-height;
-  padding: $input-padding-y;
-
-  &:not(:disabled):not([readonly]) {
-    cursor: pointer;
-  }
-
-  &::-moz-color-swatch {
-    border: 0 !important; // stylelint-disable-line declaration-no-important
-    @include border-radius($input-border-radius);
-  }
-
-  &::-webkit-color-swatch {
-    border: 0 !important; // stylelint-disable-line declaration-no-important
-    @include border-radius($input-border-radius);
-  }
-
-  &.form-control-sm {
-    height: $input-height-sm;
-  }
-
-  &.form-control-lg {
-    height: $input-height-lg;
-  }
+.bg-grey {
+  max-width: 100%;
+  width: 148px;
+}
+//Modal height
+.modal-container {
+  top: 4% !important;
 }

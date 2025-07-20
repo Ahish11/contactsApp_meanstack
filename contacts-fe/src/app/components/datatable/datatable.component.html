@@ -1,26 +1,108 @@
-<form class="d-flex my-3">
-  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" (input)="search($event)">
-  <!-- <button class="btn btn-outline-success" type="submit">Search</button> -->
+@if(searchbar){
+<form class="d-flex justify-content-end my-3">
+  <div><input class="form-control me-2" type="search" placeholder="Search" (input)="search($event)"></div>
 </form>
+}
 
-
-<table class="table">
-  <thead>
-    <tr>
-      @for(headeritem of headerData; track headerData){
-      <th>{{headeritem}}</th>
+@if(rowdata.length>0){
+<div class="table-responsive">
+  <table class="table w-100">
+    <thead>
+      <tr>
+        @for(headeritem of headerData; track headerData){
+        @if(headeritem !== '_id'){
+        <th>{{headeritem}}</th>
+        }
+        }
+        @if(actionTemplateRef) {
+        <th>Actions</th>
+        }
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      @if(rowdata.length>0){
+      @for(rowItems of rowdata; track rowItems['_id']){
+      <tr>
+        @for(headeritem of headerData; track headeritem){
+        @if(headeritem !== '_id'){
+        <td>{{rowItems[headeritem]}}</td>
+        }
+        }
+        @if(actionTemplateRef) {
+        <td>
+          <ng-container *ngTemplateOutlet="actionTemplateRef; context: { $implicit: rowItems }">
+          </ng-container>
+        </td>
+        }
+      </tr>
       }
-    </tr>
-  </thead>
-  <tbody class="table-group-divider">
-
-    @for(rowItems of rowdata; track rowItems['_id']){
-    <tr>
-      @for(headeritem of headerData; track headeritem){
-      <td>{{rowItems[headeritem]}}</td>
+      }@else{
+      <tr>
+        <td [attr.colspan]="headerData.length" class="text-center">
+          No Search Records Found
+        </td>
+      </tr>
       }
-    </tr>
+    </tbody>
+  </table>
+</div>
+}
+@else {
+<div class="text-center">No Records Available</div>
+}
+
+<div class="d-flex align-items-center justify-content-between">
+  <div class="w-65px">
+    <form action="">
+      <select class="form-select" [value]="selectedLimit" (change)="onLimitChange($event)">
+        <!-- <option [value]="5">5</option> -->
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="50">50</option>
+        <option [value]="100">100</option>
+      </select>
+    </form>
+  </div>
+
+  <!-- <input class="form-control" type="number" name="" id="" placeholder="Jump to" (change)="jumpToHandler($event)"> -->
+
+  <div>Displaying{{totalRowData}} of {{selectedLimit}}</div>
+
+  <ul class="pagination">
+    <!-- Disabled Previous -->
+    <li class="page-item disabled">
+      <span aria-label="Previous" class="page-link">
+        <i class="bi bi-chevron-double-left"></i>
+      </span>
+    </li>
+
+    <!-- Previous -->
+    <li class="page-item" (click)="toPrev()">
+      <span aria-label="Previous" class="page-link">
+        <i class="bi bi-chevron-left"></i>
+      </span>
+    </li>
+
+    <!-- Page numbers -->
+    @for (pageSplitItem of visiblePages; track $index) {
+    <li class="page-item" [ngClass]="pageSplitItem === currentPage ? 'active' : ''" (click)="limitFn(pageSplitItem)">
+      <span class="page-link">{{ pageSplitItem }}</span>
+    </li>
     }
 
-  </tbody>
-</table>
+    <!-- Next -->
+    <li class="page-item" (click)="toNext()">
+      <span aria-label="Next" class="page-link">
+        <i class="bi bi-chevron-right"></i>
+      </span>
+    </li>
+
+    <!-- Last -->
+    <li class="page-item">
+      <span aria-label="Next" class="page-link">
+        <i class="bi bi-chevron-double-right"></i>
+      </span>
+    </li>
+  </ul>
+
+</div>

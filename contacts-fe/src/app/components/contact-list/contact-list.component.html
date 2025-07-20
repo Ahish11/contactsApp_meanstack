@@ -1,56 +1,62 @@
-<div class="form-floating">
-  <input type="name" class="form-control" id="floatingInput" placeholder="name@example.com">
-  <label for="floatingInput">Name</label>
-</div>
-<div class="form-floating">
-  <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-  <label for="floatingPassword">Email</label>
-</div>
-<div class="form-floating">
-  <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-  <label for="floatingPassword">Phone</label>
-</div>
+<div class="mx-5">
+  <div class="form-floating">
+    <input type="name" class="form-control" id="floatingInput" placeholder="name@example.com">
+    <label for="floatingInput">Name</label>
+  </div>
+  <div class="form-floating">
+    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+    <label for="floatingPassword">Email</label>
+  </div>
+  <div class="form-floating">
+    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+    <label for="floatingPassword">Phone</label>
+  </div>
 
 
-<div class="container" [hidden]="true">
-  <form class="d-flex my-3">
-    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" (input)="search($event)"
-      [(ngModel)]="searchText" name="search">
-    <!-- <button class="btn btn-outline-success" type="submit">Search</button> -->
-  </form>
-  @if(contacts.length > 0){
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        @for(itemsHeder of contactListHeader; track itemsHeder){
-        <th>{{itemsHeder}}</th>
+  <!-- <div class="container" [hidden]="true">
+    <form class="d-flex my-3">
+      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" (input)="search($event)"
+        [(ngModel)]="searchText" name="search">
+
+    </form>
+    @if(contacts.length > 0){
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          @for(itemsHeder of contactListHeader; track itemsHeder){
+          <th>{{itemsHeder}}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @if(tempContacts.length>0){
+        @for (data of tempContacts; track data._id) {
+        <tr>
+          @for (key of contactListHeader; track key) {
+          <td>{{ data[key] }}</td>
+          }
+        </tr>
         }
-      </tr>
-    </thead>
-    <tbody>
-      @if(tempContacts.length>0){
-      @for (data of tempContacts; track data._id) {
-      <tr>
-        @for (key of contactListHeader; track key) {
-        <td>{{ data[key] }}</td>
         }
-      </tr>
-      }
-      }
-      @else {
-      <tr>
-        <td [attr.colspan]="contactListHeader.length" class="text-center"> No Search Records Found</td>
-      </tr>
-      }
-    </tbody>
+        @else {
+        <tr>
+          <td [attr.colspan]="contactListHeader.length" class="text-center"> No Search Records Found</td>
+        </tr>
+        }
+      </tbody>
 
-  </table>
-  }
-  @else {
-  <div>No Records Available</div>
-  }
+    </table>
+    }
+    @else {
+    <div>No Records Available</div>
+    }
+  </div> -->
+
+
+  <app-datatable [data]="tempContacts">
+    <ng-template #actions let-item class="col-gap-6 d-flex">
+      <i class="bi bi-pencil" (click)="onEdit(item._id)"></i>
+      <i class="bi bi-trash" (click)="onDelete(item._id)"></i>
+    </ng-template>
+  </app-datatable>
 </div>
-
-
-<app-datatable [data]="tempContacts"></app-datatable>
-

@@ -1,36 +1,104 @@
-import { Component, Input } from '@angular/core';
+import { CommonModule } from "@angular/common";
+import { Component, ContentChild, Input, TemplateRef } from "@angular/core";
 
 @Component({
-  selector: 'app-datatable',
+  selector: "app-datatable",
   standalone: true,
-  imports: [],
-  templateUrl: './datatable.component.html',
-  styleUrl: './datatable.component.scss',
+  imports: [CommonModule],
+  templateUrl: "./datatable.component.html",
+  styleUrl: "./datatable.component.scss",
 })
 export class DatatableComponent {
   @Input() data: any[] = [];
+  @Input() searchbar: boolean = true;
+  @ContentChild("actions") actionTemplateRef?: TemplateRef<any>;
+
   rowdata: { [key: string]: any }[] = [];
+  allData: any[] = [];
   headerData: string[] = [];
+  totalRowData: number = 0;
+  selectedLimit = 10;
+  pageSplit: number = 0;
+  currentPage: number = 1;
+  visiblePages: number[] = [];
+  windowSize = 5; // Number of visible page numbers
 
   ngOnInit(): void {
     if (this.data?.length !== 0 && this.data != undefined) {
       this.rowdata = this.data;
-      console.log(this.data, 'datatable');
+      this.allData = this.data;
       this.headerData = this.dataKeys;
+      this.totalRowData = this.allData?.length;
+      this.paginationHandler();
+      this.updateVisiblePages();
+      this.limitFn(1);
     } else {
       this.headerData = this.dataKeys;
     }
   }
+
   get dataKeys() {
-    return this.data?.length ? Object.keys(this.data[0]) : [];
+    return this.rowdata?.length ? Object.keys(this.rowdata[0]) : [];
+  }
+
+  limitFn(page: number) {
+    const startIndex = (page - 1) * this.selectedLimit;
+    const endIndex = page * this.selectedLimit;
+    this.rowdata = this.allData?.slice(startIndex, endIndex);
+    this.currentPage = page;
+    this.updateVisiblePages();
+  }
+
+  toNext() {
+    if (this.currentPage < this.pageSplit) {
+      this.currentPage++;
+      this.limitFn(this.currentPage);
+    }
+  }
+
+  toPrev() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.limitFn(this.currentPage);
+    }
+  }
+
+  updateVisiblePages() {
+    debugger;
+    const halfWindow = Math.floor(this.windowSize / 2); //middle
+    let start = Math.max(1, this.currentPage - halfWindow);
+    let end = Math.min(this.pageSplit, start + this.windowSize - 1);
+
+    // Adjust start if we're at the end
+    if (end === this.pageSplit) {
+      start = Math.max(1, end - this.windowSize + 1);
+    }
+
+    this.visiblePages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
 
   search(event: Event) {
     const searchVal = (event.target as HTMLInputElement).value.toLowerCase();
-    this.rowdata = this.data.filter((item: any) => {
-      return Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchVal)
-      );
+    this.rowdata = this.data?.filter((item: any) => {
+      return Object.values(item).some(value => String(value).toLowerCase().includes(searchVal));
     });
+  }
+
+  onLimitChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.selectedLimit = Number(target.value);
+    this.currentPage = 1;
+    this.paginationHandler();
+    this.updateVisiblePages();
+    this.limitFn(this.currentPage);
+  }
+
+  get pageSplitList() {
+    return Array.from({ length: this.pageSplit }, (_, i) => i + 1);
+    // return [...Array(this.pageSplit)].map((_, i) => i + 1)
+  }
+
+  paginationHandler() {
+    this.pageSplit = Math.ceil(this.totalRowData / this.selectedLimit);
   }
 }
