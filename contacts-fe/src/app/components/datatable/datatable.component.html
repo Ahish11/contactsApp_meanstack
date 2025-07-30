@@ -57,27 +57,28 @@
       <select class="form-select" [value]="selectedLimit" (change)="onLimitChange($event)">
         <!-- <option [value]="5">5</option> -->
         <option [value]="10">10</option>
-        <option [value]="20">20</option>
+        <option [value]="25">25</option>
         <option [value]="50">50</option>
         <option [value]="100">100</option>
       </select>
     </form>
   </div>
 
-  <!-- <input class="form-control" type="number" name="" id="" placeholder="Jump to" (change)="jumpToHandler($event)"> -->
+  <!-- <input class="form-control max-width-120px" type="number" name="" id="" placeholder="Jump to"
+    (change)="jumpToHandler($event)"> -->
 
-  <div>Displaying{{totalRowData}} of {{selectedLimit}}</div>
+  <div> {{startIndex + 1}} to {{endIndex}} of {{totalRowData}}</div>
 
   <ul class="pagination">
     <!-- Disabled Previous -->
-    <li class="page-item disabled">
+    <li class="page-item" [ngClass]="disableFirstpage ? 'notallowed' : '' " (click)="goFirst()">
       <span aria-label="Previous" class="page-link">
         <i class="bi bi-chevron-double-left"></i>
       </span>
     </li>
 
     <!-- Previous -->
-    <li class="page-item" (click)="toPrev()">
+    <li class="page-item" [ngClass]="disableFirstpage ? 'notallowed' : ''" (click)="toPrev()">
       <span aria-label="Previous" class="page-link">
         <i class="bi bi-chevron-left"></i>
       </span>
@@ -91,14 +92,14 @@
     }
 
     <!-- Next -->
-    <li class="page-item" (click)="toNext()">
+    <li class="page-item" [ngClass]="disableLastpage ? 'notallowed' : ''" (click)="toNext()">
       <span aria-label="Next" class="page-link">
         <i class="bi bi-chevron-right"></i>
       </span>
     </li>
 
     <!-- Last -->
-    <li class="page-item">
+    <li class="page-item" [ngClass]="disableLastpage ? 'notallowed' : ''" (click)="goLast()">
       <span aria-label="Next" class="page-link">
         <i class="bi bi-chevron-double-right"></i>
       </span>

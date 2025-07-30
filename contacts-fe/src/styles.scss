@@ -91,6 +91,13 @@ body {
     font-size: #{$i * 1}px;
   }
 }
+//max-width-1000px
+@for $i from 1 through 1000 {
+  .max-width-#{$i}px {
+    max-width: #{$i * 1}px;
+  }
+}
+
 // !Common btns
 .btn-ash {
   border: 1px solid var(--ab-primary) !important;
@@ -107,6 +114,10 @@ body {
   width: 28px;
   height: 28px;
   border: 1px solid #c7ceca;
+}
+.notallowed {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 // !Common table style
 .table-th-green > thead > tr > th {

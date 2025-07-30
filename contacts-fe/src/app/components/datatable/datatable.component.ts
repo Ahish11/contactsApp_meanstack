@@ -20,8 +20,12 @@ export class DatatableComponent {
   selectedLimit = 10;
   pageSplit: number = 0;
   currentPage: number = 1;
+  endIndex!: number;
+  startIndex!: number;
   visiblePages: number[] = [];
   windowSize = 5; // Number of visible page numbers
+  disableLastpage: boolean = false;
+  disableFirstpage: boolean = false;
 
   ngOnInit(): void {
     if (this.data?.length !== 0 && this.data != undefined) {
@@ -32,6 +36,7 @@ export class DatatableComponent {
       this.paginationHandler();
       this.updateVisiblePages();
       this.limitFn(1);
+      console.log(this.pageSplitList, "pagesplit");
     } else {
       this.headerData = this.dataKeys;
     }
@@ -42,11 +47,22 @@ export class DatatableComponent {
   }
 
   limitFn(page: number) {
-    const startIndex = (page - 1) * this.selectedLimit;
-    const endIndex = page * this.selectedLimit;
-    this.rowdata = this.allData?.slice(startIndex, endIndex);
+    this.startIndex = (page - 1) * this.selectedLimit;
+    this.endIndex = page * this.selectedLimit;
+    this.rowdata = this.allData?.slice(this.startIndex, this.endIndex);
     this.currentPage = page;
     this.updateVisiblePages();
+    debugger;
+    if (this.currentPage === 1) {
+      this.disableFirstpage = true;
+    } else {
+      this.disableFirstpage = false;
+    }
+    if (this.currentPage === this.pageSplitList.length) {
+      this.disableLastpage = true;
+    } else {
+      this.disableLastpage = false;
+    }
   }
 
   toNext() {
@@ -64,7 +80,6 @@ export class DatatableComponent {
   }
 
   updateVisiblePages() {
-    debugger;
     const halfWindow = Math.floor(this.windowSize / 2); //middle
     let start = Math.max(1, this.currentPage - halfWindow);
     let end = Math.min(this.pageSplit, start + this.windowSize - 1);
@@ -91,6 +106,7 @@ export class DatatableComponent {
     this.paginationHandler();
     this.updateVisiblePages();
     this.limitFn(this.currentPage);
+    console.log(this.pageSplitList, "pagesplit");
   }
 
   get pageSplitList() {
@@ -101,4 +117,20 @@ export class DatatableComponent {
   paginationHandler() {
     this.pageSplit = Math.ceil(this.totalRowData / this.selectedLimit);
   }
+
+  goLast() {
+    this.limitFn(this.pageSplitList.length);
+    // this.disableLastpage = true;
+    // if (this.disableLastpage) {
+    //   this.disableFirstpage = false;
+    // }
+  }
+  goFirst() {
+    this.limitFn(1);
+    // this.disableFirstpage = true;
+    // if (this.disableFirstpage) {
+    //   this.disableLastpage = false;
+    // }
+  }
+  jumpToHandler(event: any) {}
 }
