@@ -17,10 +17,10 @@ const getContacts = asyncHandler(async (request, response) => {
 });
 
 // *Need try and catch for all api instead doing that Middleware express asynchandler (error nd exception handler)
-
+// http://localhost:5001/api/contacts/
 const createContact = asyncHandler(async (request, response) => {
-  console.log("req body-->", request.body);
   const { name, email, phone } = request.body;
+  console.log("createContact req body-->", request.body);
   if (!name || !email || !phone) {
     //the error will be displayed in html format. to avoid that we need errorhandler middleware folder
     response.status(400);
@@ -52,11 +52,9 @@ const updateContact = asyncHandler(async (request, response) => {
     throw new Error("contact not found in update");
   }
 
-  const updateContact = await Contact.findByIdAndUpdate(
-    request.params.id,
-    request.body,
-    { new: true }
-  );
+  const updateContact = await Contact.findByIdAndUpdate(request.params.id, request.body, {
+    new: true,
+  });
 
   response.status(200).json(updateContact);
 });

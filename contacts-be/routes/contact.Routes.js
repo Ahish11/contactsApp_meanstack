@@ -32,7 +32,7 @@ const {
   updateContact,
   deleteContact,
 } = require("../controllers/contactController");
-const validateToken = require("../middleware/validateTokenHandler");
+// const validateToken = require("../middleware/validateTokenHandler");
 
 //should be at top
 // router.use(validateToken); //validate private routes

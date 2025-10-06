@@ -1,18 +1,17 @@
-<div class="mx-5">
+<form class="mx-5" [formGroup]="AddContactForm" (ngSubmit)="addRecord()">
   <div class="form-floating">
-    <input type="name" class="form-control" id="floatingInput" placeholder="name@example.com">
+    <input type="name" class="form-control" formControlName="name" id="name">
     <label for="floatingInput">Name</label>
   </div>
   <div class="form-floating">
-    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-    <label for="floatingPassword">Email</label>
+    <input type="text" class="form-control" formControlName="email" id="email">
+    <label for="email">Email</label>
   </div>
   <div class="form-floating">
-    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-    <label for="floatingPassword">Phone</label>
+    <input type="text" class="form-control" formControlName="phone" id="phone">
+    <label for="phone">Phone</label>
   </div>
-
-
+  <button type="submit" class="btn-primary" [disabled]="AddContactForm.invalid">Create Record</button>
   <!-- <div class="container" [hidden]="true">
     <form class="d-flex my-3">
       <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" (input)="search($event)"
@@ -53,10 +52,10 @@
   </div> -->
 
 
-  <app-datatable [data]="tempContacts">
-    <ng-template #actions let-item class="col-gap-6 d-flex">
-      <i class="bi bi-pencil" (click)="onEdit(item._id)"></i>
-      <i class="bi bi-trash" (click)="onDelete(item._id)"></i>
-    </ng-template>
-  </app-datatable>
-</div>
+</form>
+<app-datatable [data]="tempContacts">
+  <ng-template #actions let-item class="d-flex gap-3  ">
+    <i class="bi bi-pencil" (click)="onEdit(item._id)"></i>
+    <i class="bi bi-trash cursor-pointer" (click)="removeContact(item._id)"></i>
+  </ng-template>
+</app-datatable>

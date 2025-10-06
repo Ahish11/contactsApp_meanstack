@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+package-lock.json
+*.min.js
+*.bundle.js
+CommonLibrary-UI-dev
+customer-management-ui-dev

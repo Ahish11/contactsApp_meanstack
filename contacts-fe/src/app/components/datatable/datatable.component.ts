@@ -1,5 +1,13 @@
 import { CommonModule } from "@angular/common";
-import { Component, ContentChild, Input, TemplateRef } from "@angular/core";
+import {
+  Component,
+  ContentChild,
+  ElementRef,
+  Input,
+  SimpleChanges,
+  TemplateRef,
+  ViewChild,
+} from "@angular/core";
 
 @Component({
   selector: "app-datatable",
@@ -12,6 +20,9 @@ export class DatatableComponent {
   @Input() data: any[] = [];
   @Input() searchbar: boolean = true;
   @ContentChild("actions") actionTemplateRef?: TemplateRef<any>;
+  @ViewChild("searchInput", { static: false }) searchInput!: ElementRef<HTMLInputElement>;
+  private searchTimeout: any;
+  searchVal: string = "";
 
   rowdata: { [key: string]: any }[] = [];
   allData: any[] = [];
@@ -34,11 +45,28 @@ export class DatatableComponent {
       this.headerData = this.dataKeys;
       this.totalRowData = this.allData?.length;
       this.paginationHandler();
-      this.updateVisiblePages();
+      // this.updateVisiblePages();
       this.limitFn(1);
-      console.log(this.pageSplitList, "pagesplit");
+      // console.log(this.pageSplitList, "pagesplit");
     } else {
       this.headerData = this.dataKeys;
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes["data"] && changes["data"].currentValue) {
+      this.rowdata = this.data;
+      this.allData = this.data;
+      this.totalRowData = this.allData?.length;
+      this.paginationHandler();
+      this.updateVisiblePages();
+      this.limitFn(1);
+      console.log(changes, "onchanges");
+      this.searchVal = "";
+      if (this.searchInput && this.searchInput.nativeElement) {
+        this.searchInput.nativeElement.value = "";
+      }
+      // this.data = changes["data"].currentValue;
     }
   }
 
@@ -52,7 +80,7 @@ export class DatatableComponent {
     this.rowdata = this.allData?.slice(this.startIndex, this.endIndex);
     this.currentPage = page;
     this.updateVisiblePages();
-    debugger;
+
     if (this.currentPage === 1) {
       this.disableFirstpage = true;
     } else {
@@ -83,20 +111,28 @@ export class DatatableComponent {
     const halfWindow = Math.floor(this.windowSize / 2); //middle
     let start = Math.max(1, this.currentPage - halfWindow);
     let end = Math.min(this.pageSplit, start + this.windowSize - 1);
-
     // Adjust start if we're at the end
     if (end === this.pageSplit) {
       start = Math.max(1, end - this.windowSize + 1);
     }
-
     this.visiblePages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
-
   search(event: Event) {
-    const searchVal = (event.target as HTMLInputElement).value.toLowerCase();
-    this.rowdata = this.data?.filter((item: any) => {
-      return Object.values(item).some(value => String(value).toLowerCase().includes(searchVal));
-    });
+    clearTimeout(this.searchTimeout);
+    this.searchVal = (event.target as HTMLInputElement).value.toLowerCase();
+    this.searchTimeout = setTimeout(() => {
+      this.rowdata = this.data.filter((item: any) => {
+        return Object.values(item).some(value =>
+          String(value).toLowerCase().includes(this.searchVal)
+        );
+      });
+      console.log(this.rowdata, "searchList");
+      this.allData = this.rowdata;
+      this.totalRowData = this.allData?.length;
+      this.limitFn(1);
+      this.paginationHandler();
+      this.updateVisiblePages();
+    }, 300); // 300ms debounce
   }
 
   onLimitChange(event: Event) {
@@ -106,7 +142,7 @@ export class DatatableComponent {
     this.paginationHandler();
     this.updateVisiblePages();
     this.limitFn(this.currentPage);
-    console.log(this.pageSplitList, "pagesplit");
+    console.log(this.pageSplitList, "getpageSplitList");
   }
 
   get pageSplitList() {
@@ -116,21 +152,14 @@ export class DatatableComponent {
 
   paginationHandler() {
     this.pageSplit = Math.ceil(this.totalRowData / this.selectedLimit);
+    console.log(this.pageSplit, "this.pageSplit");
   }
 
   goLast() {
     this.limitFn(this.pageSplitList.length);
-    // this.disableLastpage = true;
-    // if (this.disableLastpage) {
-    //   this.disableFirstpage = false;
-    // }
   }
   goFirst() {
     this.limitFn(1);
-    // this.disableFirstpage = true;
-    // if (this.disableFirstpage) {
-    //   this.disableLastpage = false;
-    // }
   }
   jumpToHandler(event: any) {}
 }

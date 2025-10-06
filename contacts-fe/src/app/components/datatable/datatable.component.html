@@ -1,6 +1,8 @@
 @if(searchbar){
 <form class="d-flex justify-content-end my-3">
-  <div><input class="form-control me-2" type="search" placeholder="Search" (input)="search($event)"></div>
+  <div><input class="form-control w-100 me-2" type="search" #searchInput placeholder="Search" (input)="search($event)"
+      [value]="searchVal">
+  </div>
 </form>
 }
 
@@ -51,6 +53,7 @@
 <div class="text-center">No Records Available</div>
 }
 
+@if(rowdata && rowdata.length > 0){
 <div class="d-flex align-items-center justify-content-between">
   <div class="w-65px">
     <form action="">
@@ -107,3 +110,4 @@
   </ul>
 
 </div>
+}
