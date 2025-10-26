@@ -38,7 +38,7 @@ const {
 // router.use(validateToken); //validate private routes
 //Get request
 router.route("/").get(getContacts).post(createContact); //!if same route
-router.route("/:id").get(getContact);
+router.route("/:id").get(getContact);//by id
 router.route("/:id").put(updateContact);
 router.route("/:id").delete(deleteContact);
 

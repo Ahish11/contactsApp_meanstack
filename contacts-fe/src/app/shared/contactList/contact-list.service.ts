@@ -26,6 +26,9 @@ export class ContactListService {
     console.log("API CALLING:", `${this.apiURL}/contacts`);
     return this.http.get<Contact[]>(`${this.apiURL}/contacts`);
   }
+  getContactsbyId(id: string): Promise<any> {
+    return lastValueFrom(this.http.get<Contact>(`${this.apiURL}/contacts/${id}`));
+  }
 
   private handleError<T>(operation = "operation", result?: T) {
     return (error: any): Observable<T> => {
@@ -41,5 +44,9 @@ export class ContactListService {
   }
   deleteContact(id: string): Promise<any> {
     return lastValueFrom(this.http.delete<any>(`${this.apiURL}/contacts/${id}`));
+  }
+  updateContact(id: string, contact: Contact) {
+    debugger;
+    return lastValueFrom(this.http.put<any>(`${this.apiURL}/contacts/${id}`, contact));
   }
 }

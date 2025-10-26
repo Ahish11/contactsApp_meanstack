@@ -30,13 +30,7 @@ export class ContactListComponent {
   // or
   // customerList: Observable<any[]> = new Observable<any[]>();
   // customerListServices = inject(ContactListService); //in ang 18
-  // ngOnInit(): void {
-  //   this.customerListFn();
-  //   console.log(this.customerListFn());
-  // }
-  // customerListFn() {
-  //   this.customerList = this.customerListServices.getContactList()
-  // }
+
   private fb = inject(FormBuilder);
   constructor(private http: HttpClient, private loaderService: LoaderService) {}
   private contactService = inject(ContactListService); // Inject service using inject()
@@ -45,7 +39,6 @@ export class ContactListComponent {
   contacts: Contact[] = [];
   tempContacts: Contact[] = [];
   contactListHeader: (keyof Contact)[] = [];
-  // contactListHeader: string[] = [];
   errorMessage: string = "";
 
   ngOnInit(): void {
@@ -57,42 +50,7 @@ export class ContactListComponent {
     });
     this.loadContacts();
   }
-  loadContacts() {
-    this.loaderService.show();
-    this.contactService
-      .getContactList()
-      .pipe(finalize(() => this.loaderService.hide()))
-      .subscribe({
-        next: contacts => {
-          this.contacts = contacts;
-          this.tempContacts = contacts;
-          if (this.contacts.length > 0) {
-            this.contactListHeader = Object.keys(this.contacts[0]) as (keyof Contact)[];
-          } else {
-            this.contactListHeader = []; // or set some default headers if needed
-          }
-
-          console.log(this.contacts);
-          console.log(this.contactListHeader, "contactListHeader");
-          this.errorMessage = "";
-        },
-        error: (error: HttpErrorResponse) => {
-          // Type the error
-          console.error("Error loading contacts:", error);
-
-          if (error.error instanceof ErrorEvent) {
-            // Client-side error
-            this.errorMessage = `An error occurred: ${error.error.message}`;
-          } else {
-            // Server-side error
-            this.errorMessage = `Server returned an error: ${error.status} ${error.statusText}`;
-          }
-          this.contacts = []; // Clear contacts on error
-          this.tempContacts = [];
-        },
-        // complete: () => this.loaderService.hide(),
-      });
-  }
+   
 
   search(event: Event) {
     const searchVal = (event.target as HTMLInputElement).value.toLowerCase();
@@ -100,12 +58,29 @@ export class ContactListComponent {
       return Object.values(item).some(value => String(value).toLowerCase().includes(searchVal));
     });
   }
+  selectedContactId: string = "";
 
-  onEdit(item: any) {
-    console.log("Edit item:", item);
-    // Implement edit logic
+  async onEdit(item: any) {
+    console.log("Edit:", item);
+    this.selectedContactId = item._id;
+    this.AddContactForm.patchValue({
+      name: item.name,
+      email: item.email,
+      phone: item.phone,
+    });
   }
-
+  async updateContact() {
+    const updatedData: Contact = this.AddContactForm.value;
+    try {
+      await this.contactService.updateContact(this.selectedContactId, updatedData);
+      await this.loadContacts();
+      this.AddContactForm.reset();
+      this.selectedContactId = "";
+    } catch (err) {
+      console.log(err);
+    } finally {
+    }
+  }
   async removeContact(id: string) {
     await this.contactService.deleteContact(id);
     this.loadContacts();
