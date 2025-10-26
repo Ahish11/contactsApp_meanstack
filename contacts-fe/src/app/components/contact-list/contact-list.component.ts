@@ -50,8 +50,32 @@ export class ContactListComponent {
     });
     this.loadContacts();
   }
-   
 
+  loadContacts() {
+    this.contactService.getContactList().subscribe({
+      next: contacts => {
+        this.contacts = contacts;
+        this.tempContacts = contacts;
+        this.contactListHeader = Object.keys(this.contacts[0]) as (keyof Contact)[];
+        console.log(this.contacts);
+        console.log(this.contactListHeader, "contactListHeader");
+        this.errorMessage = "";
+      },
+      error: (error: HttpErrorResponse) => {
+        // Type the error
+        console.error("Error loading contacts:", error);
+        if (error.error instanceof ErrorEvent) {
+          // Client-side error
+          this.errorMessage = `An error occurred: ${error.error.message}`;
+        } else {
+          // Server-side error
+          this.errorMessage = `Server returned an error: ${error.status} ${error.statusText}`;
+        }
+        this.contacts = []; // Clear contacts on error
+        this.tempContacts = [];
+      },
+    });
+  }
   search(event: Event) {
     const searchVal = (event.target as HTMLInputElement).value.toLowerCase();
     this.tempContacts = this.contacts.filter((item: Contact) => {
