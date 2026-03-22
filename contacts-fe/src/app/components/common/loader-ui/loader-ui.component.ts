@@ -28,6 +28,5 @@ export class LoaderUiComponent {
     //   console.log('hideee');
     // }
     this.isLoading$.subscribe(() => this.cdRef.markForCheck());
-    console.log('isLoading$', this.isLoading$);
   }
 }

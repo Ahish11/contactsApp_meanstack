@@ -39,6 +39,7 @@ const registerUser = asyncHandler(async (request, response) => {
 //http://localhost:5001/api/users/login
 //after login generates a ACCESS TOKEN ,only authenticated user access private routes
 const loginUser = asyncHandler(async (req, res) => {
+  console.log("DEBUG: LOGIN INITIATED - COOKIE VERSION RUNNING");
   const { email, password } = req.body;
 
   // Validate input
@@ -49,9 +50,18 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // Find user by email
   const user = await User.findOne({ email });
+  console.log("Login Attempt:", email);
+  console.log("User found in DB:", user ? "Yes" : "No");
+  if (user) {
+    console.log("Stored Hashed Password:", user.password);
+  }
 
   // Validate user and password
-  if (user && (await bcrypt.compare(password, user.password))) {
+  const isMatch = await bcrypt.compare(password, user.password);
+  console.log("Password provided:", password);
+  console.log("Password match result:", isMatch);
+
+  if (user && isMatch) {
     // Generate JWT token
     const accessToken = jwt.sign(
       {
@@ -62,10 +72,17 @@ const loginUser = asyncHandler(async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "10min" }
+      { expiresIn: "60min" }
     );
-    // Respond with the token
-    res.status(200).json({ accessToken });
+    // Respond with the token in a cookie
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 3600000, // 60 minutes
+    });
+
+    res.status(200).json({ success: true, message: "Login successful" });
   } else {
     res.status(401); // Unauthorized
     throw new Error("Unauthorized email or password");
@@ -76,4 +93,10 @@ const currentUser = asyncHandler(async (request, response) => {
   response.json(request.user);
 });
 
-module.exports = { registerUser, loginUser, currentUser };
+// @access private
+const logoutUser = asyncHandler(async (req, res) => {
+  res.clearCookie("accessToken");
+  res.status(200).json({ success: true, message: "Logged out successfully" });
+});
+
+module.exports = { registerUser, loginUser, currentUser, logoutUser };

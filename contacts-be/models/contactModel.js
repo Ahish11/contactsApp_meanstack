@@ -20,14 +20,16 @@ const contactSchema = new mongoose.Schema(
       type: String,
       required: [true, "please add the phone no"],
     },
-    // toJSON: {
-    //   transform(doc, ret) {
-    //     delete ret.__v; // removes __v only
-    //   },
-    // },
   },
   {
     timestamps: true,
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.__v;
+        delete ret.updatedAt;
+        return ret;
+      },
+    },
   }
 );
 //Contact -> denotes schema name

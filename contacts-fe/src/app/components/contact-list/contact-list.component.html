@@ -1,64 +1,39 @@
-<form class="mx-5 container" [formGroup]="AddContactForm">
-  <div class="form-floating">
-    <input type="name" class="form-control" formControlName="name" id="name">
-    <label for="floatingInput">Name</label>
+<div class="flex h-screen bg-[#f4f7fb] w-full font-sans">
+  
+  <!-- Sidebar -->
+  <app-side-nav class="w-64 flex-shrink-0 bg-white border-r border-[#e5e7eb] hidden md:block"></app-side-nav>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    
+    <!-- Top Header -->
+    <app-header class="h-16 flex-shrink-0 bg-white border-b border-[#e5e7eb] z-10"></app-header>
+    
+    <!-- Page Content -->
+    <main class="flex-1 overflow-y-auto p-8 relative">
+      <div class="max-w-6xl mx-auto w-full">
+        
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+          <div class="flex-[1]">
+            <h1 class="text-[32px] font-extrabold text-[#111827] tracking-tight leading-none mb-2">Directory</h1>
+            <p class="text-slate-500 font-medium text-sm m-0">Streamlined contact management for your entire team.</p>
+          </div>
+          <!-- The search bar is inside Datatable Component but we will style it there so it aligns right next to this -->
+        </div>
+
+        <!-- Datatable Card -->
+        <div class="bg-white rounded-[20px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] border border-[#e5e7eb]">
+           <app-datatable [data]="tempContacts" [isLoading]="isLoading">
+             <ng-template #actions let-item>
+               <div class="flex items-center gap-4 text-slate-400">
+                 <button (click)="onEdit(item)" class="hover:text-blue-500 transition-colors" title="Edit Contact"><i class="bi bi-pencil"></i></button>
+                 <button (click)="removeContact(item._id)" class="hover:text-red-500 transition-colors" title="Delete Contact"><i class="bi bi-trash"></i></button>
+               </div>
+             </ng-template>
+           </app-datatable>
+        </div>
+      </div>
+    </main>
   </div>
-  <div class="form-floating">
-    <input type="text" class="form-control" formControlName="email" id="email">
-    <label for="email">Email</label>
-  </div>
-  <div class="form-floating">
-    <input type="text" class="form-control" formControlName="phone" id="phone">
-    <label for="phone">Phone</label>
-  </div>
-  <button type="submit" class="btn-primary" [disabled]="AddContactForm.invalid" (click)="addRecord()">Create
-    Record</button>
-  <button type="submit" class="btn-primary" [disabled]="AddContactForm.invalid"
-    (click)="updateContact()">Update</button>
-  <!-- <div class="container" [hidden]="true">
-    <form class="d-flex my-3">
-      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" (input)="search($event)"
-        [(ngModel)]="searchText" name="search">
-
-    </form>
-    @if(contacts.length > 0){
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          @for(itemsHeder of contactListHeader; track itemsHeder){
-          <th>{{itemsHeder}}</th>
-          }
-        </tr>
-      </thead>
-      <tbody>
-        @if(tempContacts.length>0){
-        @for (data of tempContacts; track data._id) {
-        <tr>
-          @for (key of contactListHeader; track key) {
-          <td>{{ data[key] }}</td>
-          }
-        </tr>
-        }
-        }
-        @else {
-        <tr>
-          <td [attr.colspan]="contactListHeader.length" class="text-center"> No Search Records Found</td>
-        </tr>
-        }
-      </tbody>
-
-    </table>
-    }
-    @else {
-    <div>No Records Available</div>
-    }
-  </div> -->
-
-
-</form>
-<app-datatable [data]="tempContacts">
-  <ng-template #actions let-item class="d-flex gap-3">
-    <i class="bi bi-pencil" (click)="onEdit(item)"></i>
-    <i class="bi bi-trash cursor-pointer" (click)="removeContact(item._id)"></i>
-  </ng-template>
-</app-datatable>
+</div>

@@ -32,11 +32,11 @@ const {
   updateContact,
   deleteContact,
 } = require("../controllers/contactController");
-// const validateToken = require("../middleware/validateTokenHandler");
+const validateToken = require("../middleware/validateTokenHandler");
 
 //should be at top
-// router.use(validateToken); //validate private routes
-//Get request
+router.use(validateToken); //validate private routes
+// Get request
 router.route("/").get(getContacts).post(createContact); //!if same route
 router.route("/:id").get(getContact);//by id
 router.route("/:id").put(updateContact);

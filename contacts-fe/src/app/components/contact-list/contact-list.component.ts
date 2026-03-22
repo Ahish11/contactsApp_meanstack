@@ -16,112 +16,68 @@ import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { DatatableComponent } from "../datatable/datatable.component";
 import { LoaderService } from "../../shared/loader/loader.service";
+import { SideNavComponent } from "../side-nav/side-nav.component";
+import { HeaderComponent } from "../header/header.component";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-contact-list",
   standalone: true,
-  imports: [FormsModule, DatatableComponent, ReactiveFormsModule],
+  imports: [FormsModule, DatatableComponent, ReactiveFormsModule, SideNavComponent, HeaderComponent],
   templateUrl: "./contact-list.component.html",
   styleUrl: "./contact-list.component.scss",
 })
 export class ContactListComponent {
-  // constructor(http: HttpClient) {
-  // }
-  // or
-  // customerList: Observable<any[]> = new Observable<any[]>();
-  // customerListServices = inject(ContactListService); //in ang 18
-
   private fb = inject(FormBuilder);
+  private router = inject(Router);
   constructor(private http: HttpClient, private loaderService: LoaderService) {}
-  private contactService = inject(ContactListService); // Inject service using inject()
-  AddContactForm!: FormGroup;
+  private contactService = inject(ContactListService);
+  
   searchText = "";
   contacts: Contact[] = [];
   tempContacts: Contact[] = [];
   contactListHeader: (keyof Contact)[] = [];
   errorMessage: string = "";
+  isLoading: boolean = false;
 
   ngOnInit(): void {
-    // this.debugAPICall();
-    this.AddContactForm = this.fb.group({
-      name: ["", Validators.required],
-      email: ["", Validators.required],
-      phone: ["", Validators.required],
-    });
     this.loadContacts();
   }
 
   loadContacts() {
-    this.contactService.getContactList().subscribe({
+    this.isLoading = true;
+    this.contactService.getContactList()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
       next: contacts => {
         this.contacts = contacts;
         this.tempContacts = contacts;
-        this.contactListHeader = Object.keys(this.contacts[0]) as (keyof Contact)[];
-        console.log(this.contacts);
-        console.log(this.contactListHeader, "contactListHeader");
+        if (this.contacts && this.contacts.length > 0) {
+          this.contactListHeader = Object.keys(this.contacts[0]) as (keyof Contact)[];
+        } else {
+          this.contactListHeader = [];
+        }
         this.errorMessage = "";
       },
       error: (error: HttpErrorResponse) => {
-        // Type the error
         console.error("Error loading contacts:", error);
         if (error.error instanceof ErrorEvent) {
-          // Client-side error
           this.errorMessage = `An error occurred: ${error.error.message}`;
         } else {
-          // Server-side error
           this.errorMessage = `Server returned an error: ${error.status} ${error.statusText}`;
         }
-        this.contacts = []; // Clear contacts on error
+        this.contacts = [];
         this.tempContacts = [];
       },
     });
   }
-  search(event: Event) {
-    const searchVal = (event.target as HTMLInputElement).value.toLowerCase();
-    this.tempContacts = this.contacts.filter((item: Contact) => {
-      return Object.values(item).some(value => String(value).toLowerCase().includes(searchVal));
-    });
-  }
-  selectedContactId: string = "";
 
-  async onEdit(item: any) {
-    console.log("Edit:", item);
-    this.selectedContactId = item._id;
-    this.AddContactForm.patchValue({
-      name: item.name,
-      email: item.email,
-      phone: item.phone,
-    });
-  }
-  async updateContact() {
-    const updatedData: Contact = this.AddContactForm.value;
-    try {
-      await this.contactService.updateContact(this.selectedContactId, updatedData);
-      await this.loadContacts();
-      this.AddContactForm.reset();
-      this.selectedContactId = "";
-    } catch (err) {
-      console.log(err);
-    } finally {
-    }
-  }
   async removeContact(id: string) {
     await this.contactService.deleteContact(id);
     this.loadContacts();
   }
 
-  addRecord(): void {
-    console.log(this.AddContactForm.value, "this.AddContactForm.value");
-    // Check if the form is valid before submitting
-    if (this.AddContactForm.invalid) {
-      alert("Name is a required field.");
-      return;
-    }
-
-    // Use the form's value to create the new record
-    this.contactService.createContact(this.AddContactForm.value).subscribe(() => {
-      this.loadContacts();
-      this.AddContactForm.reset();
-    });
+  onEdit(item: any) {
+    this.router.navigate(['/add-contact'], { state: { contact: item, isEdit: true } });
   }
 }

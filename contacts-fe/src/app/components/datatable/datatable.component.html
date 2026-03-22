@@ -1,113 +1,145 @@
 @if(searchbar){
-<form class="d-flex justify-content-end my-3">
-  <div><input class="form-control w-100 me-2" type="search" #searchInput placeholder="Search" (input)="search($event)"
-      [value]="searchVal">
+<div class="flex justify-end mb-6 gap-3">
+  <div class="relative w-full max-w-sm">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class="bi bi-search text-slate-400"></i>
+      </div>
+      <input class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 placeholder:text-slate-400 bg-white shadow-sm" type="search" #searchInput placeholder="Search by name, email..." (input)="search($event)" [value]="searchVal">
   </div>
-</form>
+  <button class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors shadow-sm font-medium">
+      <i class="bi bi-sliders text-lg"></i>
+  </button>
+</div>
 }
 
-@if(rowdata.length>0){
-<div class="table-responsive">
-  <table class="table w-100">
+@if (isLoading) {
+  <app-skeleton-table></app-skeleton-table>
+}
+@else {
+@if(rowdata.length > 0){
+<div class="overflow-x-auto">
+  <table class="w-full text-left whitespace-nowrap">
     <thead>
-      <tr>
-        @for(headeritem of headerData; track headerData){
-        @if(headeritem !== '_id'){
-        <th>{{headeritem}}</th>
-        }
+      <tr class="border-b border-slate-200">
+        @for(headeritem of headerData; track headeritem){
+          @if(headeritem !== '_id'){
+          <th class="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest relative group">
+            <div class="flex items-center gap-2 cursor-pointer hover:text-slate-600 select-none pb-1 relative">
+              <span class="flex items-center gap-1" (click)="onSort(headeritem)">
+                {{headeritem}}
+                <span class="text-slate-300 group-hover:text-slate-400 transition-colors ml-1">
+                  @if(sortColumn === headeritem && sortDirection === 'asc') { <i class="bi bi-arrow-up"></i> }
+                  @if(sortColumn === headeritem && sortDirection === 'desc') { <i class="bi bi-arrow-down"></i> }
+                  @if(sortColumn !== headeritem) { <i class="bi bi-arrow-down-up opacity-0 group-hover:opacity-100 transition-opacity"></i> }
+                </span>
+              </span>
+
+              <button class="ml-auto text-slate-400 hover:text-blue-500 transition-colors" (click)="toggleFilterDropdown(headeritem, $event)">
+                <i class="bi bi-funnel-fill shadow-sm" [class.text-blue-500]="isFilterActive(headeritem)"></i>
+              </button>
+            </div>
+
+            <!-- Custom Filter Dropdown -->
+            @if(activeDropdownColumn === headeritem) {
+            <div class="absolute top-12 left-6 z-50 bg-white border border-slate-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-4 min-w-[240px]" (click)="stopPropagation($event)">
+              <div class="mb-3 relative">
+                <i class="bi bi-search absolute left-3 top-2.5 text-slate-400 text-xs text-center"></i>
+                <input type="text" class="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors placeholder:text-slate-400" placeholder="Search..." [(ngModel)]="filterSearchText[headeritem]">
+              </div>
+              
+              <div class="max-h-48 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                <div class="flex items-center pb-2 mb-2 border-b border-slate-100">
+                  <input class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer" type="checkbox" id="selectAll-{{headeritem}}" [checked]="isAllSelected(headeritem)" (change)="toggleAllFilter(headeritem, $event)">
+                  <label class="ml-2 text-sm font-bold text-slate-700 cursor-pointer select-none" for="selectAll-{{headeritem}}">(Select All)</label>
+                </div>
+
+                @for(val of getFilteredDistinctValues(headeritem); track val){
+                <div class="flex items-start">
+                  <input class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer mt-0.5" type="checkbox" id="check-{{headeritem}}-{{val}}" [checked]="activeFilters[headeritem].has(val)" (change)="toggleFilterValue(headeritem, val, $event)">
+                  <label class="ml-2 text-sm font-medium text-slate-600 cursor-pointer select-none" for="check-{{headeritem}}-{{val}}">{{val}}</label>
+                </div>
+                }
+                @if(getFilteredDistinctValues(headeritem).length === 0){
+                  <div class="text-slate-400 text-sm text-center py-4">No matches</div>
+                }
+              </div>
+            </div>
+            }
+          </th>
+          }
         }
         @if(actionTemplateRef) {
-        <th>Actions</th>
+          <th class="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
         }
       </tr>
     </thead>
-    <tbody class="table-group-divider">
-      @if(rowdata.length>0){
+    <tbody class="divide-y divide-slate-100">
       @for(rowItems of rowdata; track rowItems['_id']){
-      <tr>
+      <tr class="hover:bg-slate-50 transition-colors group">
         @for(headeritem of headerData; track headeritem){
-        @if(headeritem !== '_id'){
-        <td>{{rowItems[headeritem]}}</td>
-        }
+          @if(headeritem !== '_id'){
+            <td class="py-4 px-6 align-middle">
+              @if(headeritem === 'name'){
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center bg-blue-50 text-blue-600 font-bold text-[13px] border border-blue-100 uppercase shadow-sm">
+                    {{ (rowItems[headeritem] || 'U').substring(0, 2) }}
+                  </div>
+                  <div>
+                    <div class="font-bold text-slate-900 text-[15px] leading-tight">{{rowItems[headeritem]}}</div>
+                    <div class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1">PRODUCT LEAD</div>
+                  </div>
+                </div>
+              }
+              @else {
+                <span class="text-[15px] font-medium text-slate-600">{{rowItems[headeritem]}}</span>
+              }
+            </td>
+          }
         }
         @if(actionTemplateRef) {
-        <td>
-          <ng-container *ngTemplateOutlet="actionTemplateRef; context: { $implicit: rowItems }">
-          </ng-container>
+        <td class="py-4 px-6 text-right whitespace-nowrap align-middle">
+          <ng-container *ngTemplateOutlet="actionTemplateRef; context: { $implicit: rowItems }"></ng-container>
         </td>
         }
-      </tr>
-      }
-      }@else{
-      <tr>
-        <td [attr.colspan]="headerData.length" class="text-center">
-          No Search Records Found
-        </td>
       </tr>
       }
     </tbody>
   </table>
 </div>
-}
-@else {
-<div class="text-center">No Records Available</div>
+} @else {
+  <div class="text-center py-12 text-slate-500 font-medium text-sm border-t border-slate-100"> No Records Available</div>
 }
 
 @if(rowdata && rowdata.length > 0){
-<div class="d-flex align-items-center justify-content-between">
-  <div class="w-65px">
-    <form action="">
-      <select class="form-select" [value]="selectedLimit" (change)="onLimitChange($event)">
-        <!-- <option [value]="5">5</option> -->
-        <option [value]="10">10</option>
-        <option [value]="25">25</option>
-        <option [value]="50">50</option>
-        <option [value]="100">100</option>
-      </select>
-    </form>
+<div class="flex items-center justify-between p-5 border-t border-slate-100 bg-slate-50/50 rounded-b-[20px]">
+  <div class="uppercase tracking-widest text-[11px] font-bold text-slate-500">
+    SHOWING {{endIndex - startIndex}} OF {{totalRowData}} CONTACTS
   </div>
 
-  <!-- <input class="form-control max-width-120px" type="number" name="" id="" placeholder="Jump to"
-    (change)="jumpToHandler($event)"> -->
-
-  <div> {{startIndex + 1}} to {{endIndex}} of {{totalRowData}}</div>
-
-  <ul class="pagination">
-    <!-- Disabled Previous -->
-    <li class="page-item" [ngClass]="disableFirstpage ? 'notallowed' : '' " (click)="goFirst()">
-      <span aria-label="Previous" class="page-link">
-        <i class="bi bi-chevron-double-left"></i>
-      </span>
-    </li>
-
-    <!-- Previous -->
-    <li class="page-item" [ngClass]="disableFirstpage ? 'notallowed' : ''" (click)="toPrev()">
-      <span aria-label="Previous" class="page-link">
-        <i class="bi bi-chevron-left"></i>
-      </span>
-    </li>
-
-    <!-- Page numbers -->
-    @for (pageSplitItem of visiblePages; track $index) {
-    <li class="page-item" [ngClass]="pageSplitItem === currentPage ? 'active' : ''" (click)="limitFn(pageSplitItem)">
-      <span class="page-link">{{ pageSplitItem }}</span>
-    </li>
+  <div class="flex items-center gap-1">
+    <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 text-slate-400 disabled:opacity-30 transition-colors cursor-pointer" [disabled]="disableFirstpage" (click)="toPrev()">
+      <i class="bi bi-chevron-left text-[10px] stroke-[2px]"></i>
+    </button>
+    
+    @for(pageSplitItem of visiblePages; track $index){
+      <button 
+        class="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-extrabold transition-all cursor-pointer"
+        [class.bg-blue-500]="pageSplitItem === currentPage"
+        [class.text-white]="pageSplitItem === currentPage"
+        [class.shadow-md]="pageSplitItem === currentPage"
+        [class.text-slate-600]="pageSplitItem !== currentPage"
+        [class.hover:bg-slate-200]="pageSplitItem !== currentPage"
+        (click)="limitFn(pageSplitItem)"
+      >
+        {{ pageSplitItem }}
+      </button>
     }
 
-    <!-- Next -->
-    <li class="page-item" [ngClass]="disableLastpage ? 'notallowed' : ''" (click)="toNext()">
-      <span aria-label="Next" class="page-link">
-        <i class="bi bi-chevron-right"></i>
-      </span>
-    </li>
-
-    <!-- Last -->
-    <li class="page-item" [ngClass]="disableLastpage ? 'notallowed' : ''" (click)="goLast()">
-      <span aria-label="Next" class="page-link">
-        <i class="bi bi-chevron-double-right"></i>
-      </span>
-    </li>
-  </ul>
-
+    <!-- Removed '...' since it's hard to conditionally render array item without knowing logic, assuming visiblePages handles it -->
+    <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 text-slate-400 disabled:opacity-30 transition-colors cursor-pointer" [disabled]="disableLastpage" (click)="toNext()">
+      <i class="bi bi-chevron-right text-[10px] stroke-[2px]"></i>
+    </button>
+  </div>
 </div>
+}
 }

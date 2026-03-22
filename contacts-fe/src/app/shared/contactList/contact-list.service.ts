@@ -1,7 +1,7 @@
 import { addons } from "@storybook/manager-api";
 import { HttpClient, provideHttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { catchError, lastValueFrom, Observable, Observer, of } from "rxjs";
+import { catchError, lastValueFrom, Observable, Observer, of, timeout } from "rxjs";
 import { Contact } from "./../../interface/contactList";
 import { environment } from "../../../../enviroments/environment";
 @Injectable({
@@ -24,7 +24,15 @@ export class ContactListService {
   // }
   getContactList(): Observable<Contact[]> {
     console.log("API CALLING:", `${this.apiURL}/contacts`);
-    return this.http.get<Contact[]>(`${this.apiURL}/contacts`);
+    return this.http.get<Contact[]>(`${this.apiURL}/contacts`).pipe(
+      // timeout(5000),
+      catchError(error => {
+        if (error?.status !== 401) {
+          console.error("Backend unreachable or timed out", error.message || error);
+        }
+        return of([]); 
+      })
+    );
   }
   getContactsbyId(id: string): Promise<any> {
     return lastValueFrom(this.http.get<Contact>(`${this.apiURL}/contacts/${id}`));
@@ -46,7 +54,6 @@ export class ContactListService {
     return lastValueFrom(this.http.delete<any>(`${this.apiURL}/contacts/${id}`));
   }
   updateContact(id: string, contact: Contact) {
-    debugger;
     return lastValueFrom(this.http.put<any>(`${this.apiURL}/contacts/${id}`, contact));
   }
 }
