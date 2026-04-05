@@ -8,11 +8,12 @@ const User = require("../models/userModel");
 const registerUser = asyncHandler(async (request, response) => {
   console.log("req body-->", request.body);
   const { username, email, password } = request.body;
+  const emailFormat = email.toLowerCase().trim();
   if (!username || !email || !password) {
     response.status(400);
     throw new Error("All Fields are Mandatory");
   }
-  const userAvailable = await User.findOne({ email });
+  const userAvailable = await User.findOne({ email: emailFormat });
   if (userAvailable) {
     response.status(400);
     throw new Error("User already register");
@@ -22,7 +23,7 @@ const registerUser = asyncHandler(async (request, response) => {
   console.log("hashedPassword:", hashedPassword);
   const user = await User.create({
     username,
-    email,
+    email: emailFormat,
     password: hashedPassword,
   });
   if (user) {
@@ -32,7 +33,7 @@ const registerUser = asyncHandler(async (request, response) => {
     response.status(400);
     throw new Error("User Data is not Valide");
   }
-  response.json({ message: "Register User" });
+  // response.json({ message: "Register User" });
 });
 
 //api/users/login
@@ -48,8 +49,9 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new Error("email || password fields are mandatory");
   }
 
+  const emailFormat = email.toLowerCase().trim();
   // Find user by email
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: emailFormat });
   console.log("Login Attempt:", email);
   console.log("User found in DB:", user ? "Yes" : "No");
   if (user) {

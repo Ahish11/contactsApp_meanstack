@@ -23,7 +23,13 @@ import { Router } from "@angular/router";
 @Component({
   selector: "app-contact-list",
   standalone: true,
-  imports: [FormsModule, DatatableComponent, ReactiveFormsModule, SideNavComponent, HeaderComponent],
+  imports: [
+    FormsModule,
+    DatatableComponent,
+    ReactiveFormsModule,
+    SideNavComponent,
+    HeaderComponent,
+  ],
   templateUrl: "./contact-list.component.html",
   styleUrl: "./contact-list.component.scss",
 })
@@ -32,13 +38,13 @@ export class ContactListComponent {
   private router = inject(Router);
   constructor(private http: HttpClient, private loaderService: LoaderService) {}
   private contactService = inject(ContactListService);
-  
+
   searchText = "";
   contacts: Contact[] = [];
   tempContacts: Contact[] = [];
   contactListHeader: (keyof Contact)[] = [];
   errorMessage: string = "";
-  isLoading: boolean = false;
+  isLoading: boolean = true;
 
   ngOnInit(): void {
     this.loadContacts();
@@ -46,30 +52,31 @@ export class ContactListComponent {
 
   loadContacts() {
     this.isLoading = true;
-    this.contactService.getContactList()
-      .pipe(finalize(() => this.isLoading = false))
+    this.contactService
+      .getContactList()
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
-      next: contacts => {
-        this.contacts = contacts;
-        this.tempContacts = contacts;
-        if (this.contacts && this.contacts.length > 0) {
-          this.contactListHeader = Object.keys(this.contacts[0]) as (keyof Contact)[];
-        } else {
-          this.contactListHeader = [];
-        }
-        this.errorMessage = "";
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error("Error loading contacts:", error);
-        if (error.error instanceof ErrorEvent) {
-          this.errorMessage = `An error occurred: ${error.error.message}`;
-        } else {
-          this.errorMessage = `Server returned an error: ${error.status} ${error.statusText}`;
-        }
-        this.contacts = [];
-        this.tempContacts = [];
-      },
-    });
+        next: contacts => {
+          this.contacts = contacts;
+          this.tempContacts = contacts;
+          if (this.contacts && this.contacts.length > 0) {
+            this.contactListHeader = Object.keys(this.contacts[0]) as (keyof Contact)[];
+          } else {
+            this.contactListHeader = [];
+          }
+          this.errorMessage = "";
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error("Error loading contacts:", error);
+          if (error.error instanceof ErrorEvent) {
+            this.errorMessage = `An error occurred: ${error.error.message}`;
+          } else {
+            this.errorMessage = `Server returned an error: ${error.status} ${error.statusText}`;
+          }
+          this.contacts = [];
+          this.tempContacts = [];
+        },
+      });
   }
 
   async removeContact(id: string) {
@@ -78,6 +85,6 @@ export class ContactListComponent {
   }
 
   onEdit(item: any) {
-    this.router.navigate(['/add-contact'], { state: { contact: item, isEdit: true } });
+    this.router.navigate(["/add-contact"], { state: { contact: item, isEdit: true } });
   }
 }

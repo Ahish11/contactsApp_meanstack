@@ -1,24 +1,25 @@
 <div class="skeleton-table">
-    <table>
-        <thead>
-            <tr>
-                <th class="col-small"><span class="skeleton skeleton-header"></span></th>
-                <th class="col-large"><span class="skeleton skeleton-header"></span></th>
-                <th class="col-medium"><span class="skeleton skeleton-header"></span></th>
-                <th class="col-medium"><span class="skeleton skeleton-header"></span></th>
-                <th class="col-small"><span class="skeleton skeleton-header"></span></th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (item of rowsArray; track $index) {
-                <tr>
-                    <td><span class="skeleton skeleton-text short"></span></td>
-                    <td><span class="skeleton skeleton-text"></span></td>
-                    <td><span class="skeleton skeleton-text medium"></span></td>
-                    <td><span class="skeleton skeleton-badge"></span></td>
-                    <td><span class="skeleton skeleton-text short"></span></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+  <table>
+    <thead>
+      <tr>
+        <th class="col-small"><span class="skeleton skeleton-header"></span></th>
+        <th class="col-large"><span class="skeleton skeleton-header"></span></th>
+        <th class="col-medium"><span class="skeleton skeleton-header"></span></th>
+        <th class="col-medium"><span class="skeleton skeleton-header"></span></th>
+        <th class="col-small"><span class="skeleton skeleton-header"></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of rowsArray; track $index) {
+      <tr>
+        <td><span class="skeleton skeleton-text short"></span></td>
+        <td><span class="skeleton skeleton-text"></span></td>
+        <td><span class="skeleton skeleton-text medium"></span></td>
+        <td><span class="skeleton skeleton-text medium"></span></td>
+        <!-- <td><span class="skeleton skeleton-badge"></span></td> -->
+        <td><span class="skeleton skeleton-text short"></span></td>
+      </tr>
+      }
+    </tbody>
+  </table>
 </div>

@@ -9,7 +9,7 @@ import {
   ViewChild,
   HostListener,
   OnInit,
-  OnChanges
+  OnChanges,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { SkeletonTableComponent } from "../common/skeleton-table/skeleton-table.component";
@@ -24,10 +24,10 @@ import { SkeletonTableComponent } from "../common/skeleton-table/skeleton-table.
 export class DatatableComponent implements OnInit, OnChanges {
   @Input() data: any[] = [];
   @Input() searchbar: boolean = true;
-  @Input() isLoading: boolean = false;
+  @Input() isLoading: boolean = true;
   @ContentChild("actions") actionTemplateRef?: TemplateRef<any>;
   @ViewChild("searchInput", { static: false }) searchInput!: ElementRef<HTMLInputElement>;
-  
+
   private searchTimeout: any;
   searchVal: string = "";
 
@@ -35,7 +35,7 @@ export class DatatableComponent implements OnInit, OnChanges {
   rowdata: { [key: string]: any }[] = []; // Currently visible page data
   filteredData: any[] = []; // Data after ALL filters and sorts are applied (before pagination)
   headerData: string[] = [];
-  
+
   // Pagination state
   totalRowData: number = 0;
   selectedLimit = 10;
@@ -44,26 +44,27 @@ export class DatatableComponent implements OnInit, OnChanges {
   endIndex!: number;
   startIndex!: number;
   visiblePages: number[] = [];
-  windowSize = 5; 
+  windowSize = 5;
   disableLastpage: boolean = false;
   disableFirstpage: boolean = false;
 
   // --- Sorting State ---
   sortColumn: string | null = null;
-  sortDirection: 'asc' | 'desc' = 'asc';
+  sortDirection: "asc" | "desc" = "asc";
 
   // --- Filter State ---
   activeDropdownColumn: string | null = null;
   distinctValues: { [key: string]: string[] } = {};
   activeFilters: { [key: string]: Set<string> } = {};
   filterSearchText: { [key: string]: string } = {};
+  hasLoaded = false;
 
   // Close dropdown when clicking outside
-  @HostListener('document:click', ['$event'])
+  @HostListener("document:click", ["$event"])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     // If the click is not inside a filter dropdown or the filter icon button, close the active dropdown.
-    if (!target.closest('.custom-filter-dropdown') && !target.closest('.filter-icon-btn')) {
+    if (!target.closest(".custom-filter-dropdown") && !target.closest(".filter-icon-btn")) {
       this.activeDropdownColumn = null;
     }
   }
@@ -72,20 +73,28 @@ export class DatatableComponent implements OnInit, OnChanges {
     if (this.data && this.data.length > 0) {
       this.initializeData();
     } else {
-        this.headerData = this.dataKeys;
+      this.headerData = this.dataKeys;
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["data"] && changes["data"].currentValue) {
-      if (!changes["data"].firstChange) { // Maintain state if possible, or reset
+      if (!changes["data"].firstChange) {
+        // Maintain state if possible, or reset
         this.resetFiltersAndSort();
       }
       this.initializeData();
-      
+
       if (this.searchInput && this.searchInput.nativeElement) {
         this.searchInput.nativeElement.value = "";
       }
+    }
+    if (
+      changes["isLoading"] &&
+      changes["isLoading"].previousValue === true &&
+      changes["isLoading"].currentValue === false
+    ) {
+      this.hasLoaded = true;
     }
   }
 
@@ -103,17 +112,17 @@ export class DatatableComponent implements OnInit, OnChanges {
   onSort(column: string) {
     if (this.sortColumn === column) {
       // Toggle direction or remove sort
-      if (this.sortDirection === 'asc') {
-        this.sortDirection = 'desc';
+      if (this.sortDirection === "asc") {
+        this.sortDirection = "desc";
       } else {
         this.sortColumn = null;
-        this.sortDirection = 'asc';
+        this.sortDirection = "asc";
       }
     } else {
       this.sortColumn = column;
-      this.sortDirection = 'asc';
+      this.sortDirection = "asc";
     }
-    
+
     this.applyAllFiltersAndSort();
   }
 
@@ -121,19 +130,19 @@ export class DatatableComponent implements OnInit, OnChanges {
   extractDistinctValues() {
     this.distinctValues = {};
     if (!this.data) return;
-    
+
     this.headerData.forEach(col => {
-      if (col !== '_id') {
-        const uniqueKeys = new Set(this.data.map(item => String(item[col] || '')));
+      if (col !== "_id") {
+        const uniqueKeys = new Set(this.data.map(item => String(item[col] || "")));
         // Sort distinct values alphabetically for the dropdown list
         this.distinctValues[col] = Array.from(uniqueKeys).sort((a, b) => a.localeCompare(b));
-        
+
         // Initialize active filters set if not exists
         if (!this.activeFilters[col]) {
           this.activeFilters[col] = new Set<string>();
         }
         if (!this.filterSearchText[col]) {
-           this.filterSearchText[col] = "";
+          this.filterSearchText[col] = "";
         }
       }
     });
@@ -145,7 +154,40 @@ export class DatatableComponent implements OnInit, OnChanges {
       this.activeDropdownColumn = null; // Toggle off if clicking the same icon
     } else {
       this.activeDropdownColumn = column;
+      this.calculateDropdownPosition(event as MouseEvent);
     }
+  }
+
+  dropdownStyles: any = {};
+
+  calculateDropdownPosition(event: MouseEvent) {
+    const target = event.currentTarget as HTMLElement;
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+
+    let styles: any = {};
+    const dropdownWidth = 260; // Approximate dropdown width
+    const dropdownHeight = 320; // Approximate dropdown height
+
+    // Horizontal positioning
+    if (rect.left + dropdownWidth > window.innerWidth) {
+      styles["right"] = `${window.innerWidth - rect.right}px`;
+      styles["left"] = "auto";
+    } else {
+      styles["left"] = `${rect.left}px`;
+      styles["right"] = "auto";
+    }
+
+    // Vertical positioning
+    if (rect.bottom + dropdownHeight > window.innerHeight && rect.top > dropdownHeight) {
+      styles["bottom"] = `${window.innerHeight - rect.top + 8}px`;
+      styles["top"] = "auto";
+    } else {
+      styles["top"] = `${rect.bottom + 8}px`;
+      styles["bottom"] = "auto";
+    }
+
+    this.dropdownStyles = styles;
   }
 
   stopPropagation(event: Event) {
@@ -173,7 +215,7 @@ export class DatatableComponent implements OnInit, OnChanges {
   toggleAllFilter(column: string, event: Event) {
     const isChecked = (event.target as HTMLInputElement).checked;
     const visibleValues = this.getFilteredDistinctValues(column);
-    
+
     if (isChecked) {
       visibleValues.forEach(val => this.activeFilters[column].add(val));
     } else {
@@ -199,7 +241,7 @@ export class DatatableComponent implements OnInit, OnChanges {
   }
 
   // --- Central Data Processing Pipeline ---
-  
+
   search(event: Event) {
     clearTimeout(this.searchTimeout);
     this.searchVal = (event.target as HTMLInputElement).value.toLowerCase();
@@ -209,11 +251,11 @@ export class DatatableComponent implements OnInit, OnChanges {
   }
 
   resetFiltersAndSort() {
-     this.searchVal = "";
-     this.sortColumn = null;
-     this.activeDropdownColumn = null;
-     this.activeFilters = {};
-     this.filterSearchText = {};
+    this.searchVal = "";
+    this.sortColumn = null;
+    this.activeDropdownColumn = null;
+    this.activeFilters = {};
+    this.filterSearchText = {};
   }
 
   applyAllFiltersAndSort() {
@@ -225,7 +267,9 @@ export class DatatableComponent implements OnInit, OnChanges {
     if (this.searchVal) {
       resultData = resultData.filter((item: any) => {
         return Object.values(item).some(value =>
-          String(value || "").toLowerCase().includes(this.searchVal)
+          String(value || "")
+            .toLowerCase()
+            .includes(this.searchVal)
         );
       });
     }
@@ -234,7 +278,7 @@ export class DatatableComponent implements OnInit, OnChanges {
     this.headerData.forEach(col => {
       if (this.isFilterActive(col)) {
         resultData = resultData.filter(item => {
-          const itemValue = String(item[col] || '');
+          const itemValue = String(item[col] || "");
           return this.activeFilters[col].has(itemValue);
         });
       }
@@ -243,11 +287,11 @@ export class DatatableComponent implements OnInit, OnChanges {
     // 3. Sorting
     if (this.sortColumn) {
       const col = this.sortColumn;
-      const dirMult = this.sortDirection === 'asc' ? 1 : -1;
-      
+      const dirMult = this.sortDirection === "asc" ? 1 : -1;
+
       resultData.sort((a, b) => {
-        const valA = String(a[col] || '').toLowerCase();
-        const valB = String(b[col] || '').toLowerCase();
+        const valA = String(a[col] || "").toLowerCase();
+        const valB = String(b[col] || "").toLowerCase();
         if (valA < valB) return -1 * dirMult;
         if (valA > valB) return 1 * dirMult;
         return 0;
@@ -262,7 +306,6 @@ export class DatatableComponent implements OnInit, OnChanges {
     this.limitFn(this.currentPage);
   }
 
-
   // --- Pagination Logic ---
 
   limitFn(page: number) {
@@ -272,8 +315,8 @@ export class DatatableComponent implements OnInit, OnChanges {
     this.currentPage = page;
     this.updateVisiblePages();
 
-    this.disableFirstpage = (this.currentPage === 1 || this.totalRowData === 0);
-    this.disableLastpage = (this.currentPage === this.pageSplit || this.totalRowData === 0);
+    this.disableFirstpage = this.currentPage === 1 || this.totalRowData === 0;
+    this.disableLastpage = this.currentPage === this.pageSplit || this.totalRowData === 0;
   }
 
   onLimitChange(event: Event) {
@@ -292,16 +335,16 @@ export class DatatableComponent implements OnInit, OnChanges {
     const halfWindow = Math.floor(this.windowSize / 2); //middle
     let start = Math.max(1, this.currentPage - halfWindow);
     let end = Math.min(this.pageSplit, start + this.windowSize - 1);
-    
+
     // Adjust start if we're at the end
     if (end === this.pageSplit) {
       start = Math.max(1, end - this.windowSize + 1);
     }
-    
-    if(this.pageSplit === 0) {
-        this.visiblePages = [];
+
+    if (this.pageSplit === 0) {
+      this.visiblePages = [];
     } else {
-        this.visiblePages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+      this.visiblePages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
     }
   }
 
@@ -325,7 +368,7 @@ export class DatatableComponent implements OnInit, OnChanges {
 
   goFirst() {
     if (this.currentPage > 1) {
-       this.limitFn(1);
+      this.limitFn(1);
     }
   }
 
@@ -335,4 +378,3 @@ export class DatatableComponent implements OnInit, OnChanges {
     }
   }
 }
-

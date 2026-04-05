@@ -1,37 +1,38 @@
-<div class="flex h-screen bg-[#f4f7fb] w-full font-sans">
-  
+<div class="flex h-screen bg-[#f4f7fb] w-full">
+
   <!-- Sidebar -->
   <app-side-nav class="w-64 flex-shrink-0 bg-white border-r border-[#e5e7eb] hidden md:block"></app-side-nav>
 
   <!-- Main Content -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-    
+
     <!-- Top Header -->
     <app-header class="h-16 flex-shrink-0 bg-white border-b border-[#e5e7eb] z-10"></app-header>
-    
+
     <!-- Page Content -->
-    <main class="flex-1 overflow-y-auto p-8 relative">
+    <main class="flex-1 overflow-y-auto p-4 relative">
       <div class="max-w-6xl mx-auto w-full">
-        
-        <!-- Header Section -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-          <div class="flex-[1]">
-            <h1 class="text-[32px] font-extrabold text-[#111827] tracking-tight leading-none mb-2">Directory</h1>
-            <p class="text-slate-500 font-medium text-sm m-0">Streamlined contact management for your entire team.</p>
-          </div>
-          <!-- The search bar is inside Datatable Component but we will style it there so it aligns right next to this -->
-        </div>
+
+
 
         <!-- Datatable Card -->
-        <div class="bg-white rounded-[20px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] border border-[#e5e7eb]">
-           <app-datatable [data]="tempContacts" [isLoading]="isLoading">
-             <ng-template #actions let-item>
-               <div class="flex items-center gap-4 text-slate-400">
-                 <button (click)="onEdit(item)" class="hover:text-blue-500 transition-colors" title="Edit Contact"><i class="bi bi-pencil"></i></button>
-                 <button (click)="removeContact(item._id)" class="hover:text-red-500 transition-colors" title="Delete Contact"><i class="bi bi-trash"></i></button>
-               </div>
-             </ng-template>
-           </app-datatable>
+        <div>
+          <app-datatable [data]="tempContacts" [isLoading]="isLoading">
+            <ng-template #actions let-item>
+              <div class="flex items-center gap-3">
+                <button (click)="onEdit(item)" class="hover:text-blue-500 transition-colors" title="Edit Contact"><i
+                    class="bi bi-pencil"></i></button>
+                <button (click)="removeContact(item._id)" class="hover:text-red-500 transition-colors"
+                  title="Delete Contact"><i class="bi bi-trash"></i></button>
+              </div>
+            </ng-template>
+
+            <!-- Header Section -->
+            <div>
+              <h1 class="text-xl font-semibold text-[#111827] mb-0">Directory</h1>
+              <p class="text-slate-500 font-medium text-xs m-0">Streamlined contact management for your entire team.</p>
+            </div>
+          </app-datatable>
         </div>
       </div>
     </main>
